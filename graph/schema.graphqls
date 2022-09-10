@@ -1,0 +1,54 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar Time
+
+enum Role {
+  OWNER
+  GUEST
+}
+
+type Genre {
+  id: Int!
+  title: String!
+}
+
+type Account {
+  id: Int!
+  genre: Genre!
+  amount: Int!
+  description: String!
+  created_at: Time!
+}
+
+type User {
+  id: Int!
+  name: String!
+  role: Role!
+}
+
+type Analysis {
+  amount: Int!
+}
+
+input NewGenre {
+  title: String!
+}
+
+input NewAccount {
+  description: String!
+  amount: Int!
+  genre_id: Int!
+}
+
+type Query {
+  accounts: [Account]!
+  analysis(start: Time!, end: Time!): Analysis
+  genres: [Genre]!
+}
+
+type Mutation {
+  createAccount(input: NewAccount!): Account!
+  createGenre(input: NewGenre!): Genre!
+}
