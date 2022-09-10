@@ -1,0 +1,38 @@
+query analysis($start: Time!, $end: Time!) {
+  analysis(start: $start, end: $end) {
+    amount
+  }
+}
+
+query accounts {
+  accounts {
+    id
+    genre {
+      id
+      title
+    }
+    amount
+    description
+    created_at
+  }
+}
+
+query genres {
+  genres {
+    id
+    title
+  }
+}
+
+mutation account($newAccount: NewAccount!) {
+  createAccount(input: $newAccount) {
+    id
+    genre {
+      id
+      title
+    }
+    amount
+    description
+    created_at
+  }
+}
