@@ -1,3 +1,4 @@
 /tmp
 /docker
 /client/node_modules
+/credentials.json
