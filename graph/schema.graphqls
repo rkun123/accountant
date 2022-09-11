@@ -28,8 +28,15 @@ type User {
   role: Role!
 }
 
+type GenreAnalysis {
+  genre: Genre!
+  amount: Int!
+}
+
 type Analysis {
   amount: Int!
+  consumes: [GenreAnalysis]!
+  incomes: [GenreAnalysis]!
 }
 
 input NewGenre {

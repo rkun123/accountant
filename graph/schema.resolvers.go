@@ -134,6 +134,68 @@ func (r *queryResolver) Analysis(ctx context.Context, start time.Time, end time.
 	if err := row.Scan(&analysis.Amount); err != nil {
 		return nil, err
 	}
+
+	// analyse consumes
+	consumeSql := `
+	SELECT
+		SUM(amount), genres.id, genres.title
+	FROM
+		accounts
+	JOIN
+		genres
+	ON
+		accounts.genre_id = genres.id
+	WHERE
+		created_at > ? AND created_at < ? AND accounts.amount < 0
+	GROUP BY
+		genres.id
+	`
+
+	consumeRows, err := con.Query(consumeSql, start, end)
+	if err != nil {
+		return nil, err
+	}
+	consumeAnalysises := []*model.GenreAnalysis{}
+	for consumeRows.Next() {
+		consumeAnalysis := &model.GenreAnalysis{
+			Genre: &model.Genre{},
+		}
+		consumeRows.Scan(&consumeAnalysis.Amount, &consumeAnalysis.Genre.ID, &consumeAnalysis.Genre.Title)
+		consumeAnalysises = append(consumeAnalysises, consumeAnalysis)
+	}
+
+	// analyse consumes
+	incomeSql := `
+	SELECT
+		SUM(amount), genres.id, genres.title
+	FROM
+		accounts
+	JOIN
+		genres
+	ON
+		accounts.genre_id = genres.id
+	WHERE
+		created_at > ? AND created_at < ? AND accounts.amount > 0
+	GROUP BY
+		genres.id
+	`
+
+	incomeRows, err := con.Query(incomeSql, start, end)
+	if err != nil {
+		return nil, err
+	}
+	incomeAnalysises := []*model.GenreAnalysis{}
+	for incomeRows.Next() {
+		incomeAnalysis := &model.GenreAnalysis{
+			Genre: &model.Genre{},
+		}
+		incomeRows.Scan(&incomeAnalysis.Amount, &incomeAnalysis.Genre.ID, &incomeAnalysis.Genre.Title)
+		incomeAnalysises = append(incomeAnalysises, incomeAnalysis)
+	}
+
+	analysis.Consumes = consumeAnalysises
+	analysis.Incomes = incomeAnalysises
+
 	return analysis, nil
 	// panic(fmt.Errorf("not implemented: Analysis - analysis"))
 }

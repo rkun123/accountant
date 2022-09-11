@@ -28,12 +28,20 @@ export type Account = {
 export type Analysis = {
   __typename?: 'Analysis';
   amount: Scalars['Int'];
+  consumes: Array<Maybe<GenreAnalysis>>;
+  incomes: Array<Maybe<GenreAnalysis>>;
 };
 
 export type Genre = {
   __typename?: 'Genre';
   id: Scalars['Int'];
   title: Scalars['String'];
+};
+
+export type GenreAnalysis = {
+  __typename?: 'GenreAnalysis';
+  amount: Scalars['Int'];
+  genre: Genre;
 };
 
 export type Mutation = {
@@ -104,7 +112,7 @@ export type AnalysisQueryVariables = Exact<{
 }>;
 
 
-export type AnalysisQuery = { __typename?: 'Query', analysis?: { __typename?: 'Analysis', amount: number } | null };
+export type AnalysisQuery = { __typename?: 'Query', analysis?: { __typename?: 'Analysis', amount: number, consumes: Array<{ __typename?: 'GenreAnalysis', amount: number, genre: { __typename?: 'Genre', id: number, title: string } } | null>, incomes: Array<{ __typename?: 'GenreAnalysis', amount: number, genre: { __typename?: 'Genre', id: number, title: string } } | null> } | null };
 
 export type AccountsQueryVariables = Exact<{
   month?: InputMaybe<Scalars['Time']>;
@@ -144,6 +152,20 @@ export const AnalysisDocument = gql`
     query analysis($start: Time!, $end: Time!) {
   analysis(start: $start, end: $end) {
     amount
+    consumes {
+      genre {
+        id
+        title
+      }
+      amount
+    }
+    incomes {
+      genre {
+        id
+        title
+      }
+      amount
+    }
   }
 }
     `;

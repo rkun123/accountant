@@ -1,6 +1,20 @@
 query analysis($start: Time!, $end: Time!) {
   analysis(start: $start, end: $end) {
     amount
+    consumes {
+      genre {
+        id
+        title
+      }
+      amount
+    }
+    incomes {
+      genre {
+        id
+        title
+      }
+      amount
+    }
   }
 }
 

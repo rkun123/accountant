@@ -54,12 +54,19 @@ type ComplexityRoot struct {
 	}
 
 	Analysis struct {
-		Amount func(childComplexity int) int
+		Amount   func(childComplexity int) int
+		Consumes func(childComplexity int) int
+		Incomes  func(childComplexity int) int
 	}
 
 	Genre struct {
 		ID    func(childComplexity int) int
 		Title func(childComplexity int) int
+	}
+
+	GenreAnalysis struct {
+		Amount func(childComplexity int) int
+		Genre  func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -149,6 +156,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Analysis.Amount(childComplexity), true
 
+	case "Analysis.consumes":
+		if e.complexity.Analysis.Consumes == nil {
+			break
+		}
+
+		return e.complexity.Analysis.Consumes(childComplexity), true
+
+	case "Analysis.incomes":
+		if e.complexity.Analysis.Incomes == nil {
+			break
+		}
+
+		return e.complexity.Analysis.Incomes(childComplexity), true
+
 	case "Genre.id":
 		if e.complexity.Genre.ID == nil {
 			break
@@ -162,6 +183,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Genre.Title(childComplexity), true
+
+	case "GenreAnalysis.amount":
+		if e.complexity.GenreAnalysis.Amount == nil {
+			break
+		}
+
+		return e.complexity.GenreAnalysis.Amount(childComplexity), true
+
+	case "GenreAnalysis.genre":
+		if e.complexity.GenreAnalysis.Genre == nil {
+			break
+		}
+
+		return e.complexity.GenreAnalysis.Genre(childComplexity), true
 
 	case "Mutation.createAccount":
 		if e.complexity.Mutation.CreateAccount == nil {
@@ -351,8 +386,15 @@ type User {
   role: Role!
 }
 
+type GenreAnalysis {
+  genre: Genre!
+  amount: Int!
+}
+
 type Analysis {
   amount: Int!
+  consumes: [GenreAnalysis]!
+  incomes: [GenreAnalysis]!
 }
 
 input NewGenre {
@@ -791,6 +833,106 @@ func (ec *executionContext) fieldContext_Analysis_amount(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Analysis_consumes(ctx context.Context, field graphql.CollectedField, obj *model.Analysis) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Analysis_consumes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Consumes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.GenreAnalysis)
+	fc.Result = res
+	return ec.marshalNGenreAnalysis2ᚕᚖgithubᚗcomᚋrkun123ᚋaccountantᚋgraphᚋmodelᚐGenreAnalysis(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Analysis_consumes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Analysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "genre":
+				return ec.fieldContext_GenreAnalysis_genre(ctx, field)
+			case "amount":
+				return ec.fieldContext_GenreAnalysis_amount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GenreAnalysis", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Analysis_incomes(ctx context.Context, field graphql.CollectedField, obj *model.Analysis) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Analysis_incomes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Incomes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.GenreAnalysis)
+	fc.Result = res
+	return ec.marshalNGenreAnalysis2ᚕᚖgithubᚗcomᚋrkun123ᚋaccountantᚋgraphᚋmodelᚐGenreAnalysis(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Analysis_incomes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Analysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "genre":
+				return ec.fieldContext_GenreAnalysis_genre(ctx, field)
+			case "amount":
+				return ec.fieldContext_GenreAnalysis_amount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GenreAnalysis", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Genre_id(ctx context.Context, field graphql.CollectedField, obj *model.Genre) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Genre_id(ctx, field)
 	if err != nil {
@@ -874,6 +1016,100 @@ func (ec *executionContext) fieldContext_Genre_title(ctx context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GenreAnalysis_genre(ctx context.Context, field graphql.CollectedField, obj *model.GenreAnalysis) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GenreAnalysis_genre(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Genre, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Genre)
+	fc.Result = res
+	return ec.marshalNGenre2ᚖgithubᚗcomᚋrkun123ᚋaccountantᚋgraphᚋmodelᚐGenre(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GenreAnalysis_genre(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GenreAnalysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Genre_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Genre_title(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Genre", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GenreAnalysis_amount(ctx context.Context, field graphql.CollectedField, obj *model.GenreAnalysis) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GenreAnalysis_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GenreAnalysis_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GenreAnalysis",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1167,6 +1403,10 @@ func (ec *executionContext) fieldContext_Query_analysis(ctx context.Context, fie
 			switch field.Name {
 			case "amount":
 				return ec.fieldContext_Analysis_amount(ctx, field)
+			case "consumes":
+				return ec.fieldContext_Analysis_consumes(ctx, field)
+			case "incomes":
+				return ec.fieldContext_Analysis_incomes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Analysis", field.Name)
 		},
@@ -3422,6 +3662,20 @@ func (ec *executionContext) _Analysis(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "consumes":
+
+			out.Values[i] = ec._Analysis_consumes(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "incomes":
+
+			out.Values[i] = ec._Analysis_incomes(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3453,6 +3707,41 @@ func (ec *executionContext) _Genre(ctx context.Context, sel ast.SelectionSet, ob
 		case "title":
 
 			out.Values[i] = ec._Genre_title(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var genreAnalysisImplementors = []string{"GenreAnalysis"}
+
+func (ec *executionContext) _GenreAnalysis(ctx context.Context, sel ast.SelectionSet, obj *model.GenreAnalysis) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, genreAnalysisImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GenreAnalysis")
+		case "genre":
+
+			out.Values[i] = ec._GenreAnalysis_genre(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "amount":
+
+			out.Values[i] = ec._GenreAnalysis_amount(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -4112,6 +4401,44 @@ func (ec *executionContext) marshalNGenre2ᚖgithubᚗcomᚋrkun123ᚋaccountant
 	return ec._Genre(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNGenreAnalysis2ᚕᚖgithubᚗcomᚋrkun123ᚋaccountantᚋgraphᚋmodelᚐGenreAnalysis(ctx context.Context, sel ast.SelectionSet, v []*model.GenreAnalysis) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOGenreAnalysis2ᚖgithubᚗcomᚋrkun123ᚋaccountantᚋgraphᚋmodelᚐGenreAnalysis(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4475,6 +4802,13 @@ func (ec *executionContext) marshalOGenre2ᚖgithubᚗcomᚋrkun123ᚋaccountant
 		return graphql.Null
 	}
 	return ec._Genre(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOGenreAnalysis2ᚖgithubᚗcomᚋrkun123ᚋaccountantᚋgraphᚋmodelᚐGenreAnalysis(ctx context.Context, sel ast.SelectionSet, v *model.GenreAnalysis) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._GenreAnalysis(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

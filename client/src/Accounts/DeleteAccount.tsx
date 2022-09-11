@@ -13,6 +13,7 @@ const DeleteAccount: FC<Props> = ({ id }: Props) => {
   const refetch = refetchSignal.usePublish();
 
   async function deleteAccount() {
+    if (!confirm("削除しますか？")) return;
     await deleteAccountMutation({
       variables: {
         id,

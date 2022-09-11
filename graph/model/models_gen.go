@@ -18,12 +18,19 @@ type Account struct {
 }
 
 type Analysis struct {
-	Amount int `json:"amount"`
+	Amount   int              `json:"amount"`
+	Consumes []*GenreAnalysis `json:"consumes"`
+	Incomes  []*GenreAnalysis `json:"incomes"`
 }
 
 type Genre struct {
 	ID    int    `json:"id"`
 	Title string `json:"title"`
+}
+
+type GenreAnalysis struct {
+	Genre  *Genre `json:"genre"`
+	Amount int    `json:"amount"`
 }
 
 type NewAccount struct {
