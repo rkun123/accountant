@@ -46,7 +46,6 @@ const SelectGenre: FC<Props> = ({
       onChange={(e) => {
         e && setGenreId(e.value);
       }}
-      value={options.find((o) => o.value === genreId)}
       onCreateOption={(v) => createGenre(v)}
     />
   );
