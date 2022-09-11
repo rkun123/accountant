@@ -3,19 +3,26 @@ import { Genre, useAccountMutation } from "../generated/graphql";
 import { refetchSignal } from "../lib";
 
 export default function useEditor(genres: Genre[]) {
-  const [amount, setAmount] = useState(0);
-  const [genreId, setGenreId] = useState(0);
+  const [amount, setAmount] = useState<number>();
+  const [genreId, setGenreId] = useState<number>();
   const [description, setDescription] = useState("");
   const [accountMutation, { data }] = useAccountMutation();
   const refetch = refetchSignal.usePublish();
 
-  const sendable = useMemo(
-    () => amount !== 0 && genreId > 0,
-    [amount, genreId]
-  );
+  const sendable =
+    amount !== undefined &&
+    genreId !== undefined &&
+    amount !== 0 &&
+    genreId > 0;
+
+  function reset() {
+    setAmount(0);
+    setGenreId(0);
+    setDescription("");
+  }
 
   const send = useCallback(async () => {
-    if (amount === 0 || genreId < 1) return;
+    if (!sendable) return;
     await accountMutation({
       variables: {
         newAccount: {
@@ -25,10 +32,8 @@ export default function useEditor(genres: Genre[]) {
         },
       },
     });
-    setAmount(0);
-    setGenreId(0);
-    setDescription("");
     refetch(null);
+    reset();
   }, [amount, genreId]);
 
   return {
@@ -36,7 +41,9 @@ export default function useEditor(genres: Genre[]) {
     setGenreId,
     setDescription,
     send,
+    amount,
     genreId,
+    description,
     sendable,
   };
 }

@@ -38,7 +38,13 @@ const Analysis: FC<Props> = ({
     <div>
       {typeof amount === "number" && (
         <div
-          className={clsx("rounded-md", "border-2", "border-slate-700", "p-8")}
+          className={clsx(
+            "rounded-md",
+            "border-2",
+            "border-slate-700",
+            "px-8",
+            "py-4"
+          )}
         >
           <div
             className={clsx("flex", "flex-row", "font-bold", "justify-between")}

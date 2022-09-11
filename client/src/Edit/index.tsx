@@ -7,8 +7,16 @@ import useEditor from "./useEditor";
 const Edit: FC = () => {
   const { data, refetch: _refetch } = useGenresQuery();
   const genres = data?.genres.filter((g) => g !== null) as Genre[];
-  const { setGenreId, setAmount, setDescription, send, genreId, sendable } =
-    useEditor(genres);
+  const {
+    setGenreId,
+    setAmount,
+    setDescription,
+    send,
+    amount,
+    description,
+    genreId,
+    sendable,
+  } = useEditor(genres);
 
   function addAccount() {
     send();
@@ -42,7 +50,7 @@ const Edit: FC = () => {
           <input
             className={clsx("w-full", "h-8", "p-2")}
             type="number"
-            defaultValue={0}
+            value={amount}
             onChange={(e) => setAmount(parseInt(e.target.value, 10))}
           />
         </RowEdit>
@@ -50,15 +58,21 @@ const Edit: FC = () => {
           <input
             className={clsx("w-full", "h-8", "p-2", "rounded-sm")}
             type="text"
+            value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
         </RowEdit>
         <RowEdit label="Send">
           <button
-            className={clsx("px-6", "py-1", "rounded-full", "bg-slate-300")}
+            className={clsx(
+              "px-6",
+              "py-1",
+              "rounded-full",
+              "disabled:bg-slate-500",
+              "bg-slate-300"
+            )}
             disabled={!sendable}
             onClick={() => {
-              console.log("hoge");
               addAccount();
             }}
           >

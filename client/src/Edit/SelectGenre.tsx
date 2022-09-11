@@ -3,7 +3,7 @@ import SelectCreatable from "react-select/creatable";
 import { Genre, useGenreMutation } from "../generated/graphql";
 
 type Props = {
-  genreId: number;
+  genreId?: number;
   setGenreId: (id: number) => void;
   refetchGenres: () => Promise<void>;
   genres: Genre[];
