@@ -1,6 +1,12 @@
 import clsx from "clsx";
 import dayjs from "dayjs";
-import { Account, useAccountsQuery } from "../generated/graphql";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Tokyo");
+import { Account } from "../generated/graphql";
 
 type Props = {
   account: Account;
@@ -18,10 +24,9 @@ const AccountComponent: React.FC<Props> = ({ account }: Props) => {
         <div className={clsx("text-sm", "italic")}>{account.genre.title}</div>
       </div>
       <div className={clsx("text-sm")}>
-        {dayjs(account.created_at).format("YYYY/MM/DD hh:mm:ss")}
+        {dayjs(account.created_at).tz().local().format()}
       </div>
     </div>
   );
 };
-
 export default AccountComponent;

@@ -7,7 +7,7 @@ import (
 )
 
 var db *sql.DB = nil
-var dbConf = "accountant:accountant@tcp(db:3306)/accountant?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=true"
+var dbConf = "accountant:accountant@tcp(db:3306)/accountant?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=true&loc=Asia%2FTokyo"
 
 func GetDB() *sql.DB {
 	return db
