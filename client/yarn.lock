@@ -4894,6 +4894,11 @@ react-select@^5.4.0:
     prop-types "^15.6.0"
     react-transition-group "^4.3.0"
 
+react-signal@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/react-signal/-/react-signal-0.3.0.tgz#0193633b0a27d7b322152ea09635213787ccea73"
+  integrity sha512-1lMLElczdzSCVXuNvuHl0tosJdQ8yBg3A1TuKjNMR2EVdkFYgjIK060coBafPW4Nv7SlsHARzP43RNUTkRwQjw==
+
 react-transition-group@^4.3.0:
   version "4.4.5"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.5.tgz#e53d4e3f3344da8521489fbef8f2581d42becdd1"

@@ -36,3 +36,10 @@ mutation account($newAccount: NewAccount!) {
     created_at
   }
 }
+
+mutation genre($newGenre: NewGenre!) {
+  createGenre(input: $newGenre) {
+    id
+    title
+  }
+}

@@ -5,13 +5,17 @@ import SelectGenre from "./SelectGenre";
 import useEditor from "./useEditor";
 
 const Edit: FC = () => {
-  const { data } = useGenresQuery();
+  const { data, refetch: _refetch } = useGenresQuery();
   const genres = data?.genres.filter((g) => g !== null) as Genre[];
-  const { setGenreId, setAmount, setDescription, send, sendable } =
+  const { setGenreId, setAmount, setDescription, send, genreId, sendable } =
     useEditor(genres);
 
   function addAccount() {
     send();
+  }
+
+  async function refetch() {
+    await _refetch();
   }
 
   return (
@@ -27,11 +31,16 @@ const Edit: FC = () => {
         )}
       >
         <RowEdit label="Genre">
-          <SelectGenre genres={genres} setGenreId={setGenreId} />
+          <SelectGenre
+            genres={genres}
+            genreId={genreId}
+            setGenreId={setGenreId}
+            refetchGenres={refetch}
+          />
         </RowEdit>
         <RowEdit label="Amount">
           <input
-            className={clsx("w-full", "h-8", "p-2", "rounded-sm")}
+            className={clsx("w-full", "h-8", "p-2")}
             type="number"
             defaultValue={0}
             onChange={(e) => setAmount(parseInt(e.target.value, 10))}
@@ -72,7 +81,17 @@ const RowEdit: FC<RowProps> = ({ label, children }: RowProps) => {
   return (
     <div className={clsx("flex", "gap-4", "items-center")}>
       <div className={clsx("font-bold")}>{label}</div>
-      <div className={clsx("flex-grow")}>{children}</div>
+      <div
+        className={clsx(
+          "flex-grow",
+          "rounded-sm",
+          "border-solid",
+          "border-1",
+          "border-slate-300"
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 };

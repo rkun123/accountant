@@ -119,6 +119,13 @@ export type AccountMutationVariables = Exact<{
 
 export type AccountMutation = { __typename?: 'Mutation', createAccount: { __typename?: 'Account', id: number, amount: number, description: string, created_at: any, genre: { __typename?: 'Genre', id: number, title: string } } };
 
+export type GenreMutationVariables = Exact<{
+  newGenre: NewGenre;
+}>;
+
+
+export type GenreMutation = { __typename?: 'Mutation', createGenre: { __typename?: 'Genre', id: number, title: string } };
+
 
 export const AnalysisDocument = gql`
     query analysis($start: Time!, $end: Time!) {
@@ -273,3 +280,37 @@ export function useAccountMutation(baseOptions?: Apollo.MutationHookOptions<Acco
 export type AccountMutationHookResult = ReturnType<typeof useAccountMutation>;
 export type AccountMutationResult = Apollo.MutationResult<AccountMutation>;
 export type AccountMutationOptions = Apollo.BaseMutationOptions<AccountMutation, AccountMutationVariables>;
+export const GenreDocument = gql`
+    mutation genre($newGenre: NewGenre!) {
+  createGenre(input: $newGenre) {
+    id
+    title
+  }
+}
+    `;
+export type GenreMutationFn = Apollo.MutationFunction<GenreMutation, GenreMutationVariables>;
+
+/**
+ * __useGenreMutation__
+ *
+ * To run a mutation, you first call `useGenreMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenreMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [genreMutation, { data, loading, error }] = useGenreMutation({
+ *   variables: {
+ *      newGenre: // value for 'newGenre'
+ *   },
+ * });
+ */
+export function useGenreMutation(baseOptions?: Apollo.MutationHookOptions<GenreMutation, GenreMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GenreMutation, GenreMutationVariables>(GenreDocument, options);
+      }
+export type GenreMutationHookResult = ReturnType<typeof useGenreMutation>;
+export type GenreMutationResult = Apollo.MutationResult<GenreMutation>;
+export type GenreMutationOptions = Apollo.BaseMutationOptions<GenreMutation, GenreMutationVariables>;

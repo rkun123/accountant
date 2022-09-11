@@ -2,6 +2,7 @@ import { useAnalysisQuery } from "./generated/graphql";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import { FC, useEffect, useMemo, useState } from "react";
+import { refetchSignal } from "./lib";
 
 type Props = {
   start?: string;
@@ -15,12 +16,14 @@ const Analysis: FC<Props> = ({
   start = DEFAULT_START,
   end = DEFAULT_END,
 }: Props) => {
-  const { data, loading, error } = useAnalysisQuery({
+  const { data, loading, refetch } = useAnalysisQuery({
     variables: {
       start,
       end,
     },
   });
+
+  refetchSignal.useSubscription(() => refetch());
 
   const amount = useMemo(
     () => data && data.analysis && data.analysis.amount,
