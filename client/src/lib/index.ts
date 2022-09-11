@@ -4,7 +4,7 @@ import { createSignal } from "react-signal";
 const url: string = import.meta.env.VITE_API_URL;
 
 const client = new ApolloClient({
-  uri: "http://localhost:8080/query",
+  uri: url,
   cache: new InMemoryCache(),
 });
 
