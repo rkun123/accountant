@@ -43,7 +43,7 @@ input NewAccount {
 }
 
 type Query {
-  accounts: [Account]!
+  accounts(month: Time): [Account]!
   analysis(start: Time!, end: Time!): Analysis
   genres: [Genre]!
 }

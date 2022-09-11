@@ -68,7 +68,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Accounts func(childComplexity int) int
+		Accounts func(childComplexity int, month *time.Time) int
 		Analysis func(childComplexity int, start time.Time, end time.Time) int
 		Genres   func(childComplexity int) int
 	}
@@ -85,7 +85,7 @@ type MutationResolver interface {
 	CreateGenre(ctx context.Context, input model.NewGenre) (*model.Genre, error)
 }
 type QueryResolver interface {
-	Accounts(ctx context.Context) ([]*model.Account, error)
+	Accounts(ctx context.Context, month *time.Time) ([]*model.Account, error)
 	Analysis(ctx context.Context, start time.Time, end time.Time) (*model.Analysis, error)
 	Genres(ctx context.Context) ([]*model.Genre, error)
 }
@@ -190,7 +190,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Accounts(childComplexity), true
+		args, err := ec.field_Query_accounts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Accounts(childComplexity, args["month"].(*time.Time)), true
 
 	case "Query.analysis":
 		if e.complexity.Query.Analysis == nil {
@@ -347,7 +352,7 @@ input NewAccount {
 }
 
 type Query {
-  accounts: [Account]!
+  accounts(month: Time): [Account]!
   analysis(start: Time!, end: Time!): Analysis
   genres: [Genre]!
 }
@@ -406,6 +411,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_accounts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *time.Time
+	if tmp, ok := rawArgs["month"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("month"))
+		arg0, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["month"] = arg0
 	return args, nil
 }
 
@@ -971,7 +991,7 @@ func (ec *executionContext) _Query_accounts(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Accounts(rctx)
+		return ec.resolvers.Query().Accounts(rctx, fc.Args["month"].(*time.Time))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1009,6 +1029,17 @@ func (ec *executionContext) fieldContext_Query_accounts(ctx context.Context, fie
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Account", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_accounts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -4365,6 +4396,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalTime(*v)
 	return res
 }
 
