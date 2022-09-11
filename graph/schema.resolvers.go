@@ -80,21 +80,42 @@ func (r *mutationResolver) CreateGenre(ctx context.Context, input model.NewGenre
 	// panic(fmt.Errorf("not implemented: CreateGenre - createGenre"))
 }
 
-// Accounts is the resolver for the accounts field.
-func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) {
-	con := db.GetDB()
+func buildSQLForAccounts(month *time.Time) string {
 	sql := `
-		SELECT
-			accounts.id,
-			accounts.genre_id,
-			accounts.amount,
-			accounts.description,
-			accounts.created_at,
-			genres.title
-		FROM accounts
-		JOIN genres
-		ON accounts.genre_id = genres.id
-		`
+			SELECT
+				accounts.id,
+				accounts.genre_id,
+				accounts.amount,
+				accounts.description,
+				accounts.created_at,
+				genres.title
+			FROM accounts
+			JOIN genres
+			ON accounts.genre_id = genres.id
+			`
+	if month != nil {
+		start := month
+		end := month.AddDate(0, 1, 0)
+		sql += `
+		WHERE
+			created_at >= "` + start.Format("2006-01-02T15:04:05Z") + `"`
+		sql += `
+		AND
+			created_at < "` + end.Format("2006-01-02T15:04:05Z") + `"`
+	}
+
+	sql += `
+	ORDER BY accounts.created_at DESC
+	`
+
+	return sql
+}
+
+// Accounts is the resolver for the accounts field.
+func (r *queryResolver) Accounts(ctx context.Context, month *time.Time) ([]*model.Account, error) {
+	con := db.GetDB()
+	sql := buildSQLForAccounts(month)
+	fmt.Println(sql)
 
 	rows, err := con.Query(sql)
 	if err != nil {
@@ -120,7 +141,6 @@ func (r *queryResolver) Accounts(ctx context.Context) ([]*model.Account, error) 
 func (r *queryResolver) Analysis(ctx context.Context, start time.Time, end time.Time) (*model.Analysis, error) {
 	con := db.GetDB()
 
-	fmt.Println(start.String(), end.String())
 	row := con.QueryRow("SELECT IFNULL(SUM(amount), 0) FROM accounts WHERE created_at > ? AND created_at < ?", start, end)
 
 	analysis := &model.Analysis{}

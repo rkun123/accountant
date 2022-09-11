@@ -4,8 +4,8 @@ query analysis($start: Time!, $end: Time!) {
   }
 }
 
-query accounts {
-  accounts {
+query accounts($month: Time) {
+  accounts(month: $month) {
     id
     genre {
       id

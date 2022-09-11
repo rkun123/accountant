@@ -7,7 +7,8 @@ import useEditor from "./useEditor";
 const Edit: FC = () => {
   const { data } = useGenresQuery();
   const genres = data?.genres.filter((g) => g !== null) as Genre[];
-  const { setGenreId, setAmount, setDescription, send } = useEditor(genres);
+  const { setGenreId, setAmount, setDescription, send, sendable } =
+    useEditor(genres);
 
   function addAccount() {
     send();
@@ -46,6 +47,7 @@ const Edit: FC = () => {
         <RowEdit label="Send">
           <button
             className={clsx("px-6", "py-1", "rounded-full", "bg-slate-300")}
+            disabled={!sendable}
             onClick={() => {
               console.log("hoge");
               addAccount();

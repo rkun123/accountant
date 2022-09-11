@@ -70,6 +70,11 @@ export type Query = {
 };
 
 
+export type QueryAccountsArgs = {
+  month?: InputMaybe<Scalars['Time']>;
+};
+
+
 export type QueryAnalysisArgs = {
   end: Scalars['Time'];
   start: Scalars['Time'];
@@ -95,7 +100,9 @@ export type AnalysisQueryVariables = Exact<{
 
 export type AnalysisQuery = { __typename?: 'Query', analysis?: { __typename?: 'Analysis', amount: number } | null };
 
-export type AccountsQueryVariables = Exact<{ [key: string]: never; }>;
+export type AccountsQueryVariables = Exact<{
+  month?: InputMaybe<Scalars['Time']>;
+}>;
 
 
 export type AccountsQuery = { __typename?: 'Query', accounts: Array<{ __typename?: 'Account', id: number, amount: number, description: string, created_at: any, genre: { __typename?: 'Genre', id: number, title: string } } | null> };
@@ -150,8 +157,8 @@ export type AnalysisQueryHookResult = ReturnType<typeof useAnalysisQuery>;
 export type AnalysisLazyQueryHookResult = ReturnType<typeof useAnalysisLazyQuery>;
 export type AnalysisQueryResult = Apollo.QueryResult<AnalysisQuery, AnalysisQueryVariables>;
 export const AccountsDocument = gql`
-    query accounts {
-  accounts {
+    query accounts($month: Time) {
+  accounts(month: $month) {
     id
     genre {
       id
@@ -176,6 +183,7 @@ export const AccountsDocument = gql`
  * @example
  * const { data, loading, error } = useAccountsQuery({
  *   variables: {
+ *      month: // value for 'month'
  *   },
  * });
  */

@@ -1,7 +1,7 @@
 import { useAnalysisQuery } from "./generated/graphql";
 import clsx from "clsx";
 import dayjs from "dayjs";
-import { FC, useEffect, useMemo } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 
 type Props = {
   start?: string;
@@ -11,7 +11,10 @@ type Props = {
 const DEFAULT_START = "1970-01-01T00:00:00Z";
 const DEFAULT_END = "2100-12-31T23:59:59Z";
 
-const Analysis: FC = ({ start = DEFAULT_START, end = DEFAULT_END }: Props) => {
+const Analysis: FC<Props> = ({
+  start = DEFAULT_START,
+  end = DEFAULT_END,
+}: Props) => {
   const { data, loading, error } = useAnalysisQuery({
     variables: {
       start,
@@ -30,7 +33,7 @@ const Analysis: FC = ({ start = DEFAULT_START, end = DEFAULT_END }: Props) => {
   }, [data, loading]);
   return (
     <div>
-      {amount && (
+      {typeof amount === "number" && (
         <div
           className={clsx("rounded-md", "border-2", "border-slate-700", "p-8")}
         >
