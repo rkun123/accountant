@@ -80,35 +80,21 @@ func (r *mutationResolver) CreateGenre(ctx context.Context, input model.NewGenre
 	// panic(fmt.Errorf("not implemented: CreateGenre - createGenre"))
 }
 
-func buildSQLForAccounts(month *time.Time) string {
-	sql := `
-			SELECT
-				accounts.id,
-				accounts.genre_id,
-				accounts.amount,
-				accounts.description,
-				accounts.created_at,
-				genres.title
-			FROM accounts
-			JOIN genres
-			ON accounts.genre_id = genres.id
-			`
-	if month != nil {
-		start := month
-		end := month.AddDate(0, 1, 0)
-		sql += `
-		WHERE
-			created_at >= "` + start.Format("2006-01-02T15:04:05Z") + `"`
-		sql += `
-		AND
-			created_at < "` + end.Format("2006-01-02T15:04:05Z") + `"`
+// DeleteAccount is the resolver for the deleteAccount field.
+func (r *mutationResolver) DeleteAccount(ctx context.Context, id int) (int, error) {
+	con := db.GetDB()
+	result, err := con.Exec(`DELETE FROM accounts WHERE id = ?`, id)
+	if err != nil {
+		return 0, err
 	}
 
-	sql += `
-	ORDER BY accounts.created_at DESC
-	`
+	_id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return int(_id), nil
 
-	return sql
+	// panic(fmt.Errorf("not implemented: DeleteAccount - deleteAccount"))
 }
 
 // Accounts is the resolver for the accounts field.
@@ -186,3 +172,40 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func buildSQLForAccounts(month *time.Time) string {
+	sql := `
+			SELECT
+				accounts.id,
+				accounts.genre_id,
+				accounts.amount,
+				accounts.description,
+				accounts.created_at,
+				genres.title
+			FROM accounts
+			JOIN genres
+			ON accounts.genre_id = genres.id
+			`
+	if month != nil {
+		start := month
+		end := month.AddDate(0, 1, 0)
+		sql += `
+		WHERE
+			created_at >= "` + start.Format("2006-01-02T15:04:05Z") + `"`
+		sql += `
+		AND
+			created_at < "` + end.Format("2006-01-02T15:04:05Z") + `"`
+	}
+
+	sql += `
+	ORDER BY accounts.created_at DESC
+	`
+
+	return sql
+}

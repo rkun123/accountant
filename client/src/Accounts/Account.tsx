@@ -2,7 +2,7 @@ import clsx from "clsx";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import localizedFormat from "dayjs/plugin/localizedFormat";
+import DeleteAccount from "./DeleteAccount";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Tokyo");
@@ -23,8 +23,11 @@ const AccountComponent: React.FC<Props> = ({ account }: Props) => {
         </div>
         <div className={clsx("text-sm", "italic")}>{account.genre.title}</div>
       </div>
-      <div className={clsx("text-sm")}>
-        {dayjs(account.created_at).tz().local().format()}
+      <div className={clsx("flex", "flex-col", "items-end", "justify-between")}>
+        <div className={clsx("text-sm")}>
+          {dayjs(account.created_at).tz().local().format()}
+        </div>
+        <DeleteAccount id={account.id} />
       </div>
     </div>
   );

@@ -51,4 +51,5 @@ type Query {
 type Mutation {
   createAccount(input: NewAccount!): Account!
   createGenre(input: NewGenre!): Genre!
+  deleteAccount(id: Int!): Int!
 }

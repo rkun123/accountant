@@ -36,6 +36,7 @@ func myBasicAuth(realm string, creds map[string]string) func(next http.Handler) 
 					return
 				}
 			}
+			fmt.Println("BASIC AUTH OK")
 
 			next.ServeHTTP(w, r)
 		})

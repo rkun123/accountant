@@ -43,3 +43,7 @@ mutation genre($newGenre: NewGenre!) {
     title
   }
 }
+
+mutation deleteAccount($id: Int!) {
+  deleteAccount(id: $id)
+}

@@ -17,7 +17,7 @@ const AccountsComponent: FC<Props> = ({ month: _month }: Props) => {
     },
   });
 
-  const accounts = useMemo(() => data?.accounts, [data]);
+  const accounts = data?.accounts;
 
   refetchSignal.useSubscription(() => refetch());
 
