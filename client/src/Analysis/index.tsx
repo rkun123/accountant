@@ -1,8 +1,9 @@
-import { useAnalysisQuery } from "./generated/graphql";
+import { useAnalysisQuery } from "../generated/graphql";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import { FC, useEffect, useMemo, useState } from "react";
-import { refetchSignal } from "./lib";
+import { refetchSignal } from "../lib";
+import Graph from "./Graph";
 
 type Props = {
   start?: string;
