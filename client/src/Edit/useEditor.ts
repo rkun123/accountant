@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Genre, useAccountMutation } from "../generated/graphql";
 import { refetchSignal } from "../lib";
 
@@ -16,13 +16,17 @@ export default function useEditor(genres: Genre[]) {
     genreId > 0;
 
   function reset() {
-    setAmount(0);
-    setGenreId(0);
+    console.debug("reset");
+    setAmount(-0);
+    // setGenreId(0);
     setDescription("");
   }
 
+  useEffect(reset, []);
+
   const send = useCallback(async () => {
     if (!sendable) return;
+    console.debug(description);
     await accountMutation({
       variables: {
         newAccount: {
@@ -34,7 +38,7 @@ export default function useEditor(genres: Genre[]) {
     });
     refetch(null);
     reset();
-  }, [amount, genreId]);
+  }, [amount, genreId, description]);
 
   return {
     setAmount,

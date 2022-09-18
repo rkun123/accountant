@@ -59,7 +59,10 @@ const Edit: FC = () => {
             className={clsx("w-full", "h-8", "p-2", "rounded-sm")}
             type="text"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              console.debug(e);
+              setDescription(e.target.value);
+            }}
           />
         </RowEdit>
         <RowEdit label="Send">
