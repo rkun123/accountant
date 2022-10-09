@@ -22,7 +22,9 @@ const AccountsComponent: FC<Props> = ({ month: _month }: Props) => {
   refetchSignal.useSubscription(() => refetch());
 
   return (
-    <div className={clsx("grid", "grid-cols-1", "divide-y")}>
+    <div
+      className={clsx("grid", "grid-cols-1", "divide-y", "overflow-y-scroll")}
+    >
       {accounts &&
         accounts.map(
           (account) => account && <Account key={account.id} account={account} />
