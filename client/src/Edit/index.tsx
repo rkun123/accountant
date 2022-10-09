@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import clsx from "clsx";
 import { Genre, useGenresQuery } from "../generated/graphql";
 import SelectGenre from "./SelectGenre";
@@ -17,6 +17,27 @@ const Edit: FC = () => {
     genreId,
     sendable,
   } = useEditor(genres);
+
+  const [isIncome, setIsIncome] = useState(false);
+
+  function setAmountWithValidation(original?: number) {
+    // don't setAmount when original is NaN
+    if (!original || isNaN(original)) {
+      setAmount(0);
+      return;
+    }
+
+    if ((!isIncome && original > 0) || (isIncome && original < 0)) {
+      // invalid value -> set inverted value
+      setAmount(original * -1);
+    } else {
+      setAmount(original);
+    }
+  }
+
+  useEffect(() => {
+    setAmountWithValidation(amount);
+  }, [isIncome]);
 
   function addAccount() {
     send();
@@ -47,12 +68,31 @@ const Edit: FC = () => {
           />
         </RowEdit>
         <RowEdit label="Amount">
-          <input
-            className={clsx("w-full", "h-8", "p-2")}
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(parseInt(e.target.value, 10))}
-          />
+          <div className={clsx("flex", "gap-2")}>
+            <button
+              className={clsx(
+                "px-2",
+                "py-1",
+                "rounded",
+                isIncome ? "bg-blue-300" : "bg-red-300"
+              )}
+              defaultValue={0}
+              onClick={() => {
+                setIsIncome(!isIncome);
+              }}
+            >
+              {isIncome ? "Income" : "Outcome"}
+            </button>
+            <input
+              className={clsx("w-full", "h-8", "p-2")}
+              type="number"
+              value={amount}
+              onChange={(e) => {
+                const original = parseInt(e.target.value, 10);
+                setAmountWithValidation(original);
+              }}
+            />
+          </div>
         </RowEdit>
         <RowEdit label="Description">
           <input

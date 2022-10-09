@@ -30,14 +30,17 @@ const SelectGenre: FC<Props> = ({
   );
 
   async function createGenre(title: string) {
-    await genreMutation({
+    const res = await genreMutation({
       variables: {
         newGenre: {
           title,
         },
       },
     });
+    const createdGenreId = res.data?.createGenre.id;
+    console.debug(res);
     await refetchGenres();
+    createdGenreId && setGenreId(createdGenreId);
   }
 
   return (
