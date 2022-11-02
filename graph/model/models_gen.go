@@ -12,6 +12,7 @@ import (
 type Account struct {
 	ID          int       `json:"id"`
 	Genre       *Genre    `json:"genre"`
+	Tags        []*Tag    `json:"tags"`
 	Amount      int       `json:"amount"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
@@ -37,9 +38,19 @@ type NewAccount struct {
 	Description string `json:"description"`
 	Amount      int    `json:"amount"`
 	GenreID     int    `json:"genre_id"`
+	TagIds      []*int `json:"tag_ids"`
 }
 
 type NewGenre struct {
+	Title string `json:"title"`
+}
+
+type NewTag struct {
+	Title string `json:"title"`
+}
+
+type Tag struct {
+	ID    int    `json:"id"`
 	Title string `json:"title"`
 }
 

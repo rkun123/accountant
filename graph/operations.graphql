@@ -58,6 +58,13 @@ mutation genre($newGenre: NewGenre!) {
   }
 }
 
+mutation tag($newTag: NewTag!) {
+  createTag(input: $newTag) {
+    id
+    title
+  }
+}
+
 mutation deleteAccount($id: Int!) {
   deleteAccount(id: $id)
 }

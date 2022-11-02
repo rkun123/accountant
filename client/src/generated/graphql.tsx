@@ -23,6 +23,7 @@ export type Account = {
   description: Scalars['String'];
   genre: Genre;
   id: Scalars['Int'];
+  tags: Array<Maybe<Tag>>;
 };
 
 export type Analysis = {
@@ -48,6 +49,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createAccount: Account;
   createGenre: Genre;
+  createTag: Tag;
   deleteAccount: Scalars['Int'];
 };
 
@@ -62,6 +64,11 @@ export type MutationCreateGenreArgs = {
 };
 
 
+export type MutationCreateTagArgs = {
+  input: NewTag;
+};
+
+
 export type MutationDeleteAccountArgs = {
   id: Scalars['Int'];
 };
@@ -70,9 +77,14 @@ export type NewAccount = {
   amount: Scalars['Int'];
   description: Scalars['String'];
   genre_id: Scalars['Int'];
+  tag_ids: Array<InputMaybe<Scalars['Int']>>;
 };
 
 export type NewGenre = {
+  title: Scalars['String'];
+};
+
+export type NewTag = {
   title: Scalars['String'];
 };
 
@@ -81,6 +93,7 @@ export type Query = {
   accounts: Array<Maybe<Account>>;
   analysis?: Maybe<Analysis>;
   genres: Array<Maybe<Genre>>;
+  tags: Array<Maybe<Tag>>;
 };
 
 
@@ -98,6 +111,12 @@ export enum Role {
   Guest = 'GUEST',
   Owner = 'OWNER'
 }
+
+export type Tag = {
+  __typename?: 'Tag';
+  id: Scalars['Int'];
+  title: Scalars['String'];
+};
 
 export type User = {
   __typename?: 'User';
@@ -139,6 +158,13 @@ export type GenreMutationVariables = Exact<{
 
 
 export type GenreMutation = { __typename?: 'Mutation', createGenre: { __typename?: 'Genre', id: number, title: string } };
+
+export type TagMutationVariables = Exact<{
+  newTag: NewTag;
+}>;
+
+
+export type TagMutation = { __typename?: 'Mutation', createTag: { __typename?: 'Tag', id: number, title: string } };
 
 export type DeleteAccountMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -349,6 +375,40 @@ export function useGenreMutation(baseOptions?: Apollo.MutationHookOptions<GenreM
 export type GenreMutationHookResult = ReturnType<typeof useGenreMutation>;
 export type GenreMutationResult = Apollo.MutationResult<GenreMutation>;
 export type GenreMutationOptions = Apollo.BaseMutationOptions<GenreMutation, GenreMutationVariables>;
+export const TagDocument = gql`
+    mutation tag($newTag: NewTag!) {
+  createTag(input: $newTag) {
+    id
+    title
+  }
+}
+    `;
+export type TagMutationFn = Apollo.MutationFunction<TagMutation, TagMutationVariables>;
+
+/**
+ * __useTagMutation__
+ *
+ * To run a mutation, you first call `useTagMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTagMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [tagMutation, { data, loading, error }] = useTagMutation({
+ *   variables: {
+ *      newTag: // value for 'newTag'
+ *   },
+ * });
+ */
+export function useTagMutation(baseOptions?: Apollo.MutationHookOptions<TagMutation, TagMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<TagMutation, TagMutationVariables>(TagDocument, options);
+      }
+export type TagMutationHookResult = ReturnType<typeof useTagMutation>;
+export type TagMutationResult = Apollo.MutationResult<TagMutation>;
+export type TagMutationOptions = Apollo.BaseMutationOptions<TagMutation, TagMutationVariables>;
 export const DeleteAccountDocument = gql`
     mutation deleteAccount($id: Int!) {
   deleteAccount(id: $id)

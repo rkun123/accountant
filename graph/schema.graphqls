@@ -14,9 +14,15 @@ type Genre {
   title: String!
 }
 
+type Tag {
+  id: Int!
+  title: String!
+}
+
 type Account {
   id: Int!
   genre: Genre!
+  tags: [Tag]!
   amount: Int!
   description: String!
   created_at: Time!
@@ -43,20 +49,27 @@ input NewGenre {
   title: String!
 }
 
+input NewTag {
+  title: String!
+}
+
 input NewAccount {
   description: String!
   amount: Int!
   genre_id: Int!
+  tag_ids: [Int]!
 }
 
 type Query {
   accounts(month: Time): [Account]!
   analysis(start: Time!, end: Time!): Analysis
   genres: [Genre]!
+  tags: [Tag]!
 }
 
 type Mutation {
   createAccount(input: NewAccount!): Account!
   createGenre(input: NewGenre!): Genre!
+  createTag(input: NewTag!): Tag!
   deleteAccount(id: Int!): Int!
 }

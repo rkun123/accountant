@@ -51,7 +51,6 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input model.NewAcc
 	fmt.Println(account)
 
 	return account, nil
-	// panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
 }
 
 // CreateGenre is the resolver for the createGenre field.
@@ -76,8 +75,31 @@ func (r *mutationResolver) CreateGenre(ctx context.Context, input model.NewGenre
 	}
 
 	return genre, nil
+}
 
-	// panic(fmt.Errorf("not implemented: CreateGenre - createGenre"))
+// CreateTag is the resolver for the createTag field.
+func (r *mutationResolver) CreateTag(ctx context.Context, input model.NewTag) (*model.Tag, error) {
+	con := db.GetDB()
+
+	result, err := con.Exec(`INSERT INTO tags(title) VALUES (?)`, input.Title)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	row := con.QueryRow(`SELECT id, title FROM tags WHERE id = ?`, id)
+
+	tag := &model.Tag{}
+
+	if err := row.Scan(&tag.ID, &tag.Title); err != nil {
+		return nil, err
+	}
+
+	return tag, nil
 }
 
 // DeleteAccount is the resolver for the deleteAccount field.
@@ -226,6 +248,34 @@ func (r *queryResolver) Genres(ctx context.Context) ([]*model.Genre, error) {
 	// panic(fmt.Errorf("not implemented: Genres - genres"))
 }
 
+// Tags is the resolver for the tags field.
+func (r *queryResolver) Tags(ctx context.Context) ([]*model.Tag, error) {
+	sql := `
+		SELECT
+			id,
+			title
+		FROM tags
+	`
+
+	con := db.GetDB()
+	rows, err := con.Query(sql)
+	if err != nil {
+		return nil, err
+	}
+
+	var tags []*model.Tag
+
+	for rows.Next() {
+		tag := &model.Tag{}
+		if err := rows.Scan(&tag.ID, &tag.Title); err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+
+	return tags, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -234,40 +284,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func buildSQLForAccounts(month *time.Time) string {
-	sql := `
-			SELECT
-				accounts.id,
-				accounts.genre_id,
-				accounts.amount,
-				accounts.description,
-				accounts.created_at,
-				genres.title
-			FROM accounts
-			JOIN genres
-			ON accounts.genre_id = genres.id
-			`
-	if month != nil {
-		start := month
-		end := month.AddDate(0, 1, 0)
-		sql += `
-		WHERE
-			created_at >= "` + start.Format("2006-01-02T15:04:05Z") + `"`
-		sql += `
-		AND
-			created_at < "` + end.Format("2006-01-02T15:04:05Z") + `"`
-	}
-
-	sql += `
-	ORDER BY accounts.created_at DESC
-	`
-
-	return sql
-}
