@@ -8,7 +8,7 @@ interface Props {
 
 const TotalsByGenre = ({ genre, amount }: Props) => {
   return (
-    <div className={clsx("flex", "justify-between")}>
+    <div className={clsx("flex", "font-bold", "justify-between")}>
       <div className={clsx("font-bold", "text-lg")}>{genre.title}</div>
       <div>¥ {amount}</div>
     </div>
