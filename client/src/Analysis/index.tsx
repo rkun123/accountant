@@ -3,6 +3,7 @@ import clsx from "clsx";
 import dayjs from "dayjs";
 import { FC, useEffect, useMemo, useState } from "react";
 import { refetchSignal } from "../lib";
+import TotalsByGenre from "./TotalsByGenre";
 
 type Props = {
   start?: string;
@@ -27,7 +28,7 @@ const Analysis: FC<Props> = ({
 
   const amount = useMemo(
     () => data && data.analysis && data.analysis.amount,
-    [data]
+    [data],
   );
 
   useEffect(() => {
@@ -35,35 +36,45 @@ const Analysis: FC<Props> = ({
     !loading && console.info(data);
   }, [data, loading]);
   return (
-    <div>
-      {typeof amount === "number" && (
+    <>
+      <div>
         <div
           className={clsx(
             "rounded-md",
             "border-2",
             "border-slate-700",
             "px-8",
-            "py-4"
+            "py-4",
           )}
         >
           <div
-            className={clsx("flex", "flex-row", "font-bold", "justify-between")}
+            className={clsx(
+              "flex",
+              "flex-row",
+              "font-bold",
+              "justify-between",
+            )}
           >
             <div>{dayjs(start).format("YYYY/MM/DD")}</div>
             <div>{dayjs(end).format("YYYY/MM/DD")}</div>
           </div>
-          <div
-            className={clsx(
-              "text-4xl",
-              "font-bold",
-              amount < 0 && "text-red-700"
-            )}
-          >
-            ¥ {amount}
-          </div>
+          {typeof amount === "number"
+            ? (
+              <div
+                className={clsx(
+                  "text-4xl",
+                  "font-bold",
+                  amount < 0 && "text-red-700",
+                )}
+              >
+                ¥ {amount}
+              </div>
+            )
+            : <div>Loading ...</div>}
         </div>
-      )}
-    </div>
+      </div>
+      <TotalsByGenre start={start} end={end} />
+    </>
   );
 };
 
