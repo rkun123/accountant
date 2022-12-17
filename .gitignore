@@ -1,4 +1,6 @@
 /tmp
 /docker
 /client/node_modules
+/client/.yarn
+/client/.yarnrc.yml
 /credentials.json
