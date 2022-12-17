@@ -5,103 +5,113 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/rkun123/accountant/db"
 	"github.com/rkun123/accountant/graph/generated"
 	"github.com/rkun123/accountant/graph/model"
+	"github.com/rkun123/accountant/utils"
 )
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateAccount(ctx context.Context, input model.NewAccount) (*model.Account, error) {
 	con := db.GetDB()
+	tx, err := con.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Commit()
+
 	sql := `
 	INSERT INTO accounts(genre_id, amount, description)
 	VALUES (?, ?, ?)
 	`
-	result, err := con.Exec(sql, input.GenreID, input.Amount, input.Description)
+	result, err := tx.Exec(sql, input.GenreID, input.Amount, input.Description)
 	if err != nil {
-		return nil, err
+		return nil, utils.HandleErrorWithRollback(tx, err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return nil, err
+		return nil, utils.HandleErrorWithRollback(tx, err)
 	}
 
-	fmt.Printf("id: %d\n", id)
-
-	selectRow := con.QueryRow(`SELECT id, amount, description, created_at, genre_id FROM accounts WHERE id = ?`, id)
+	selectRow := tx.QueryRow(`SELECT id, amount, description, created_at, genre_id FROM accounts WHERE id = ?`, id)
 
 	account := &model.Account{
 		Genre: &model.Genre{},
 	}
 
 	if err := selectRow.Scan(&account.ID, &account.Amount, &account.Description, &account.CreatedAt, &account.Genre.ID); err != nil {
-		return nil, err
+		return nil, utils.HandleErrorWithRollback(tx, err)
 	}
-	fmt.Println(account)
 
-	genreRow := con.QueryRow(`SELECT id, title FROM genres WHERE id = ?`, account.Genre.ID)
+	genreRow := tx.QueryRow(`SELECT id, title FROM genres WHERE id = ?`, account.Genre.ID)
 
 	if err := genreRow.Scan(&account.Genre.ID, &account.Genre.Title); err != nil {
-		return nil, err
+		return nil, utils.HandleErrorWithRollback(tx, err)
 	}
-	fmt.Println(account)
 
 	return account, nil
-	// panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
 }
 
 // CreateGenre is the resolver for the createGenre field.
 func (r *mutationResolver) CreateGenre(ctx context.Context, input model.NewGenre) (*model.Genre, error) {
 	con := db.GetDB()
-	result, err := con.Exec(`INSERT INTO genres(title) VALUES (?)`, input.Title)
+	tx, err := con.Begin()
 	if err != nil {
 		return nil, err
+	}
+	defer tx.Commit()
+
+	result, err := tx.Exec(`INSERT INTO genres(title) VALUES (?)`, input.Title)
+	if err != nil {
+		return nil, utils.HandleErrorWithRollback(tx, err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return nil, err
+		return nil, utils.HandleErrorWithRollback(tx, err)
 	}
 
-	row := con.QueryRow(`SELECT id, title FROM genres WHERE id = ?`, id)
+	row := tx.QueryRow(`SELECT id, title FROM genres WHERE id = ?`, id)
 
 	genre := &model.Genre{}
 
 	if err := row.Scan(&genre.ID, &genre.Title); err != nil {
-		return nil, err
+		return nil, utils.HandleErrorWithRollback(tx, err)
 	}
 
 	return genre, nil
 
-	// panic(fmt.Errorf("not implemented: CreateGenre - createGenre"))
 }
 
 // DeleteAccount is the resolver for the deleteAccount field.
 func (r *mutationResolver) DeleteAccount(ctx context.Context, id int) (int, error) {
 	con := db.GetDB()
-	result, err := con.Exec(`DELETE FROM accounts WHERE id = ?`, id)
+	tx, err := con.Begin()
 	if err != nil {
 		return 0, err
 	}
+	defer tx.Commit()
 
-	_id, err := result.LastInsertId()
+	result, err := tx.Exec(`DELETE FROM accounts WHERE id = ?`, id)
 	if err != nil {
-		return 0, err
+		return 0, utils.HandleErrorWithRollback(tx, err)
 	}
-	return int(_id), nil
 
-	// panic(fmt.Errorf("not implemented: DeleteAccount - deleteAccount"))
+	deletedId, err := result.LastInsertId()
+	if err != nil {
+		return 0, utils.HandleErrorWithRollback(tx, err)
+	}
+	return int(deletedId), nil
 }
 
 // Accounts is the resolver for the accounts field.
 func (r *queryResolver) Accounts(ctx context.Context, month *time.Time) ([]*model.Account, error) {
 	con := db.GetDB()
-	sql := buildSQLForAccounts(month)
-	fmt.Println(sql)
+
+	sql := buildQueryToGetAccountsInMonth(month)
 
 	rows, err := con.Query(sql)
 	if err != nil {
@@ -120,7 +130,6 @@ func (r *queryResolver) Accounts(ctx context.Context, month *time.Time) ([]*mode
 		accounts = append(accounts, account)
 	}
 	return accounts, nil
-	// panic(fmt.Errorf("not implemented: Accounts - accounts"))
 }
 
 // Analysis is the resolver for the analysis field.
@@ -197,12 +206,12 @@ func (r *queryResolver) Analysis(ctx context.Context, start time.Time, end time.
 	analysis.Incomes = incomeAnalysises
 
 	return analysis, nil
-	// panic(fmt.Errorf("not implemented: Analysis - analysis"))
 }
 
 // Genres is the resolver for the genres field.
 func (r *queryResolver) Genres(ctx context.Context) ([]*model.Genre, error) {
 	con := db.GetDB()
+
 	sql := `
 	SELECT id, title
 	FROM genres
@@ -223,7 +232,6 @@ func (r *queryResolver) Genres(ctx context.Context) ([]*model.Genre, error) {
 	}
 
 	return genres, nil
-	// panic(fmt.Errorf("not implemented: Genres - genres"))
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -238,10 +246,10 @@ type queryResolver struct{ *Resolver }
 // !!! WARNING !!!
 // The code below was going to be deleted when updating resolvers. It has been copied here so you have
 // one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func buildSQLForAccounts(month *time.Time) string {
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func buildQueryToGetAccountsInMonth(month *time.Time) string {
 	sql := `
 			SELECT
 				accounts.id,
