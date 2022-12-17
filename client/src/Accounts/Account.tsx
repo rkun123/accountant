@@ -8,6 +8,7 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Tokyo");
 import { Account } from "../generated/graphql";
 import { useState } from "react";
+import { formatPrice } from "../lib/format";
 
 type Props = {
   account: Account;
@@ -23,7 +24,7 @@ const AccountComponent: React.FC<Props> = ({ account }: Props) => {
           <div
             className={clsx("text-2xl", account.amount < 0 && "text-red-700")}
           >
-            ¥ {account.amount}
+            ¥ {formatPrice(account.amount)}
           </div>
           <div className={clsx("text-sm", "italic")}>{account.genre.title}</div>
         </div>

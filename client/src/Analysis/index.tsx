@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { FC, useEffect, useMemo, useState } from "react";
 import { refetchSignal } from "../lib";
 import TotalsByGenre from "./TotalsByGenre";
+import { formatPrice } from "../lib/format";
 
 type Props = {
   start?: string;
@@ -67,7 +68,7 @@ const Analysis: FC<Props> = ({
                   amount < 0 && "text-red-700",
                 )}
               >
-                ¥ {amount}
+                ¥ {formatPrice(amount)}
               </div>
             )
             : <div>Loading ...</div>}
