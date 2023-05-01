@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/query": "https://mio.chinchinmogamo.ga",
+      "/query": "http://localhost:8080",
     },
   },
 });
