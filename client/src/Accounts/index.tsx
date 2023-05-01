@@ -4,6 +4,7 @@ import { useAccountsQuery } from "../generated/graphql";
 import Account from "./Account";
 import { Dayjs } from "dayjs";
 import { refetchSignal } from "../lib";
+import { useAuthContext } from "../lib/auth";
 
 type Props = {
   month: Dayjs;
@@ -15,6 +16,7 @@ const AccountsComponent: FC<Props> = ({ month: _month }: Props) => {
     variables: {
       month,
     },
+    context: useAuthContext()
   });
 
   const accounts = data?.accounts;

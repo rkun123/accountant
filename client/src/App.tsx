@@ -6,6 +6,7 @@ import Accounts from "./Accounts";
 import Edit from "./Edit";
 import useMonthRange from "./useMonthRange";
 import Twemoji from "./lib/Twemoji";
+import Signin from "./Signin";
 
 function App() {
   const { month, nextMonth, setMonth } = useMonthRange();
@@ -13,6 +14,7 @@ function App() {
     <div className="App">
       <div className="flex justify-center max-h-screen overflow-hidden p-8">
         <div className="w-screen md:w-96 flex flex-col gap-4">
+          <Signin />
           <div className={clsx("flex", "text-4xl", "justify-center")}>
             <Twemoji emoji="💸" />
           </div>
